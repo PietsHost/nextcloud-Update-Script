@@ -4,11 +4,10 @@
 #
 # Tested on CentOS 7.3
 
-echo "
- ______ __         __           _______               __   
+echo -e "\e[32m ______ __         __           _______               __   
 |   __ \__|.-----.|  |_.-----. |   |   |.-----.-----.|  |_ 
 |    __/  ||  -__||   _|__ --| |       ||  _  |__ --||   _|
-|___|  |__||_____||____|_____| |___|___||_____|_____||____|"
+|___|  |__||_____||____|_____| |___|___||_____|_____||____|\e[0m"
 echo ""
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
@@ -17,10 +16,11 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
 HTML=/var/www/html
 BACKUP=$HTML/backup
 NCPATH=$HTML/nextcloud1
-EMAIL=example@domain.com
+EMAIL=example@domain.com	# will be used for sending emails, if upgrade was successfull
+htuser='apache'  			# Webserver-User
+htgroup='apache' 			# Webserver-Group
 
 # Database Variables
-FILE=nextcloud.sql.`date +"%Y%m%d"`
 DBSERVER=127.0.0.1
 DATABASE=databasename
 USER=databaseuser
@@ -28,11 +28,10 @@ PASS=secretpassword
 
 # Variables - Do NOT Change!
 STANDARDPATH=$HTML/nextcloud
+FILE=nextcloud.sql.`date +"%Y%m%d"`
 RESTORE=nextcloud.sql
 HOST=$HOSTNAME
 ocpath=$NCPATH
-htuser='apache'
-htgroup='apache'
 rootuser='root'
 
 NCREPO="https://download.nextcloud.com/server/releases"
@@ -134,15 +133,11 @@ rsync -Aax $NCPATH/apps $BACKUP
 rsync_param_data="-Aaxv"
 rsync "$rsync_param_data" $NCPATH/data $BACKUP  |\
      pv -lep -s $(rsync "$rsync_param_data"n $NCPATH/data $BACKUP  | awk 'NF' | wc -l)
-
-if [[ $? > 0 ]]
-then
-    echo -e "\e[31mBackup was not OK.\e[0m Please check $BACKUP and see if the folders are backed up properly"
-    exit 1
-else
+	 
 	unalias rm     2> /dev/null
 	rm ${FILE}     2> /dev/null
 	rm ${FILE}.gz  2> /dev/null
+	sleep 1
 	
 	# Database Backup
 	echo ""
@@ -160,6 +155,12 @@ else
 	ls  ${FILE}.gz
 	sleep 1
 	echo ""
+
+if [[ $? > 0 ]]
+then
+    echo -e "\e[31mBackup was not OK.\e[0m Please check $BACKUP and see if the folders are backed up properly"
+    exit 1
+else
     echo -e "\e[4;32m"
     echo "Backup OK!"
     echo -e "\e[0m"
