@@ -248,6 +248,7 @@ echo -ne '\n'
 	
 	echo -e "\e[32mCopying completed.\e[0m"
 	echo ""
+	sleep 2
 
 	echo -e "\e[33mSetting file permissions...\e[0m"
 	echo ""
