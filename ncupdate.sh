@@ -17,8 +17,8 @@ HTML=/var/www/html
 BACKUP=$HTML/backup
 NCPATH=$HTML/nextcloud1
 EMAIL=example@domain.com	# will be used for sending emails, if upgrade was successfull
-htuser='apache'  			# Webserver-User
-htgroup='apache' 			# Webserver-Group
+htuser='apache'  		# Webserver-User
+htgroup='apache' 		# Webserver-Group
 
 # Database Variables
 DBSERVER=127.0.0.1
@@ -151,8 +151,7 @@ rsync "$rsync_param_data" $NCPATH/data $BACKUP  |\
 	mysqldump --opt --user=${USER} --password=${PASS} ${DATABASE} > ${FILE}
 	
 	gzip $FILE
-	echo -e "\e[32m${FILE}.gz was created:\e[0m"
-	ls  ${FILE}.gz
+	echo -e "\e[32m${FILE}.gz was created\e[0m"
 	sleep 1
 	echo ""
 
@@ -241,9 +240,14 @@ echo -ne '\n'
 	echo -e "\e[32mExtract completed.\e[0m"
 	echo ""
 	sleep 1
+	echo -e "\e[33mCopying files back to installation.... That may take a long time - depending on your installation!\e[0m"
+	echo ""
     cp -R $BACKUP/themes $NCPATH/
 	cp -R $BACKUP/config $NCPATH/
 	cp -R $BACKUP/data $NCPATH/
+	
+	echo -e "\e[32mCopying completed.\e[0m"
+	echo ""
 
 	echo -e "\e[33mSetting file permissions...\e[0m"
 	echo ""
