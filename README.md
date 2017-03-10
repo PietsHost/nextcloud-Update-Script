@@ -15,19 +15,19 @@ That's it! Visit your website and enjoy the latest version of Nextcloud!
 Simply change lines 16 - 28 to suit your needs:
 ```
 # Directories - change the following lines to suit your needs
-HTML=/var/www/html
-BACKUP=$HTML/backup
-NCPATH=$HTML/nextcloud1
+HTML=/var/www/html		# root html directory
+BACKUP=$HTML/backup		# name of the backup folder, which will be created
+NCPATH=$HTML/nextcloud1	# name of your subfolder in root html directory, where your nextcloud installation is located
 EMAIL=example@domain.com	# will be used for sending emails, if upgrade was successfull
 htuser='apache'  		 # Webserver-User
 htgroup='apache' 		 # Webserver-Group
 NAME=nextcloud_install_1 # Define a name for your Instance, which will be upgraded
 
-# Database Variables
-DBSERVER=127.0.0.1
-DATABASE=databasename
-USER=databaseuser
-PASS=S€crEtP@s$
+# Database Variables - Look in your config.php
+DBSERVER=127.0.0.1		# Database host
+DATABASE=databasename	# Database name
+USER=databaseuser		# Database username
+PASS=S€crEtP@s$			# Database password
 ```
 
 After that, set +x to the script and run it:
