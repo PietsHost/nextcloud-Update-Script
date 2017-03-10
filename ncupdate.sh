@@ -24,7 +24,7 @@ htgroup='apache' 		# Webserver-Group
 DBSERVER=127.0.0.1
 DATABASE=databasename
 USER=databaseuser
-PASS=secretpassword
+PASS=S€crEtP@s$
 
 # Variables - Do NOT Change!
 STANDARDPATH=$HTML/nextcloud
@@ -225,7 +225,7 @@ echo -ne '\n'
 	
     rm -rf $NCPATH
 	echo ""
-	echo -e "\e[32mAll files are removed!\e[0m"
+	echo -e "\e[32mAll files removed!\e[0m"
 	echo ""
 	sleep 1
 	echo -e "\e[33mFiles are being extracted... \e[0m"
@@ -305,7 +305,7 @@ then
 	# Send E-Mail if successfully updated
 	echo "Hey there!
 
-Your Nexctloud-Update went successfully!
+Your Nextcloud-Update completed successfully!
 	
 Host: $HOST 
 directory: $NCPATH
