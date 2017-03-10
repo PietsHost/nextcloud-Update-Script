@@ -39,6 +39,8 @@ NCREPO="https://download.nextcloud.com/server/releases"
 
 # Versions
 chmod +x $NCPATH/occ
+mkdir -p $HTML/backup
+mkdir -p /var/log/ncupdater
 CURRENTVERSION=$(sudo -u apache php $NCPATH/occ status | grep "versionstring" | awk '{print $3}')
 NCVERSION=$(curl -s -m 900 $NCREPO/ | tac | grep unknown.gif | sed 's/.*"nextcloud-\([^"]*\).zip.sha512".*/\1/;q')
 
@@ -317,6 +319,7 @@ then
 Your Nextcloud-Update completed successfully!
 	
 Host: $HOST 
+Name: $NAME
 directory: $NCPATH
 	
 `date +"%d.%m.%Y-%H:%M:%S"`
