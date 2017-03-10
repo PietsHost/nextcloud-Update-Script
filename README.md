@@ -25,7 +25,7 @@ FILE=nextcloud.sql.`date +"%Y%m%d"`
 DBSERVER=127.0.0.1
 DATABASE=databasename
 USER=databaseuser
-PASS=secretpassword
+PASS=S€crEtP@s$
 ```
 
 After that, set +x to the script and run it:
