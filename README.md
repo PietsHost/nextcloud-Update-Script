@@ -12,16 +12,18 @@ If everything goes as expected, the script will use the occ upgrade command to u
 That's it! Visit your website and enjoy the latest version of Nextcloud!
 
 # Usage
-Simply change lines 17 - 27 to suit your needs:
+Simply change lines 16 - 28 to suit your needs:
 ```
 # Directories - change the following lines to suit your needs
 HTML=/var/www/html
 BACKUP=$HTML/backup
 NCPATH=$HTML/nextcloud1
-EMAIL=example@domain.com
+EMAIL=example@domain.com	# will be used for sending emails, if upgrade was successfull
+htuser='apache'  		 # Webserver-User
+htgroup='apache' 		 # Webserver-Group
+NAME=nextcloud_install_1 # Define a name for your Instance, which will be upgraded
 
 # Database Variables
-FILE=nextcloud.sql.`date +"%Y%m%d"`
 DBSERVER=127.0.0.1
 DATABASE=databasename
 USER=databaseuser
