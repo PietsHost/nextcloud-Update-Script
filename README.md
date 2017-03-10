@@ -17,7 +17,7 @@ Simply change lines 16 - 28 to suit your needs:
 # Directories - change the following lines to suit your needs
 HTML=/var/www/html		# root html directory
 BACKUP=$HTML/backup		# name of the backup folder, which will be created
-NCPATH=$HTML/nextcloud1	# name of your subfolder in root html directory, where your nextcloud installation is located
+NCPATH=$HTML/nextcloud1	# name of your subfolder in html directory, where your nextcloud installation is located
 EMAIL=example@domain.com	# will be used for sending emails, if upgrade was successfull
 htuser='apache'  		 # Webserver-User
 htgroup='apache' 		 # Webserver-Group
