@@ -263,7 +263,7 @@ echo -ne '\n'
 	
 	chmod +x ${ocpath}/occ
 	sleep 2
-	echo -e "\e[32mFile permissions successfully set!\e[0m"
+	echo -e "\e[32mFile permissions set successfully!\e[0m"
 	echo ""
 	
 	# occ upgrade
