@@ -17,8 +17,9 @@ HTML=/var/www/html
 BACKUP=$HTML/backup
 NCPATH=$HTML/nextcloud1
 EMAIL=example@domain.com	# will be used for sending emails, if upgrade was successfull
-htuser='apache'  		# Webserver-User
-htgroup='apache' 		# Webserver-Group
+htuser='apache'  		 # Webserver-User
+htgroup='apache' 		 # Webserver-Group
+NAME=nextcloud_install_1 # Define a name for your Instance, which will be upgraded
 
 # Database Variables
 DBSERVER=127.0.0.1
@@ -94,6 +95,7 @@ else
     echo -e "Latest version is: \e[4;32m$NCVERSION\e[0m. Current version is: \e[4;32m$CURRENTVERSION\e[0m."
 	echo ""
     echo "No need to upgrade, this script will exit..."
+	echo "Your Nextcloud Version $NCVERSION is already up to date - No need for an upgrade - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$NAME.log
 	sleep 2
     exit 0
 fi
@@ -158,6 +160,7 @@ rsync "$rsync_param_data" $NCPATH/data $BACKUP  |\
 if [[ $? > 0 ]]
 then
     echo -e "\e[31mBackup was not OK.\e[0m Please check $BACKUP and see if the folders are backed up properly"
+	echo "NEXTCLOUD UPDATE FAILED - Backup wasn't successfull - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$NAME.log
     exit 1
 else
     echo -e "\e[4;32m"
@@ -174,6 +177,7 @@ then
     echo -e "$HTML/nextcloud-$NCVERSION.tar.bz2 \e[32mexists\e[0m"
 else
     echo "Aborting,something went wrong with the download"
+	echo "NEXTCLOUD UPDATE FAILED - Downloac couldn't be completed - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$NAME.log
     exit 1
 fi
 
@@ -182,6 +186,7 @@ then
     echo -e "$BACKUP/config/ \e[32mexists\e[0m"
 else
     echo "Something went wrong with backing up your old nextcloud instance, please check in $BACKUP if config/ folder exist."
+	echo "NEXTCLOUD UPDATE FAILED - /config couldn't be backed up - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$NAME.log
     exit 1
 fi
 
@@ -190,6 +195,7 @@ then
     echo -e "$BACKUP/data/ \e[32mexists\e[0m"
 else
     echo "Something went wrong with backing up your old nextcloud instance, please check in $BACKUP if data/ folder exist."
+	echo "NEXTCLOUD UPDATE FAILED - /data couldn't be backed up - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$NAME.log
     exit 1
 fi
 
@@ -198,6 +204,7 @@ then
     echo -e "$BACKUP/apps/ \e[32mexists\e[0m"
 else
     echo "Something went wrong with backing up your old nextcloud instance, please check in $BACKUP if apps/ folder exist."
+	echo "NEXTCLOUD UPDATE FAILED - /apps couldn't be backed up - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$NAME.log
     exit 1
 fi
 
@@ -275,6 +282,7 @@ echo -ne '\n'
     sudo -u apache php $NCPATH/occ upgrade
 else
     echo "Something went wrong with backing up your old nextcloud instance, please check in $BACKUP if the folders exist."
+	echo "NEXTCLOUD UPDATE FAILED - /themes couldn't be backed up - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$NAME.log
 	echo ""
 	echo -e "\e[33mRestoring Database...\e[0m"
 	gunzip ${FILE}.gz
@@ -284,6 +292,7 @@ else
 	echo ""
 	echo -e "\e[32mDatabase restored successfully...\e[0m"
 	echo ""
+	echo "NEXTCLOUD UPDATE FAILED - Database restored successfully - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$NAME.log
 	sleep 1
     exit 1
 fi
@@ -300,7 +309,7 @@ then
 	echo ""
 	echo -e "\e[4;32mUPGRADE SUCCESS!\e[0m"
     echo ""
-    echo "NEXTCLOUD UPDATE success-`date +"%Y%m%d"`" >> /var/log/cronjobs_success.log
+    echo "NEXTCLOUD UPDATE success - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$NAME.log
 	
 	# Send E-Mail if successfully updated
 	echo "Hey there!
@@ -330,5 +339,6 @@ else
     echo "Your files are still backed up at $BACKUP. No worries!"
     echo "Please report this issue to support@piets-host.de"
 	echo ""
+	echo "NEXTCLOUD UPDATE FAILED - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$NAME.log
     exit 1
 fi
