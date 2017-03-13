@@ -97,7 +97,7 @@ else
     echo -e "Latest version is: \e[4;32m$NCVERSION\e[0m. Current version is: \e[4;32m$CURRENTVERSION\e[0m."
 	echo ""
     echo "No need to upgrade, this script will exit..."
-	echo "Your Nextcloud Version $NCVERSION is already up to date - No need for an upgrade - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$NAME.log
+	echo "Your Nextcloud Version $NCVERSION is already up to date - No upgrade needed - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$NAME.log
 	sleep 2
     exit 0
 fi
