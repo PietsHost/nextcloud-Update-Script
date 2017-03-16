@@ -3,6 +3,11 @@
 ## Piet's Host ## - ©2017, https://piets-host.de
 #
 # Tested on CentOS 7.3
+#
+# Most part of this script is based on the update script of the official Nextcloud VM by Tech and Me:
+# https://www.techandme.se/nextcloud-vm
+# https://github.com/nextcloud/vm/blob/master/nextcloud_update.sh
+
 
 echo -e "\e[32m ______ __         __           _______               __   
 |   __ \__|.-----.|  |_.-----. |   |   |.-----.-----.|  |_ 
