@@ -11,6 +11,13 @@ If everything goes as expected, the script will use the occ upgrade command to u
 
 That's it! Visit your website and enjoy the latest version of Nextcloud!
 
+# Credits
+## Current [maintainers](https://github.com/nextcloud/vm/graphs/contributors)
+* [Daniel Hanson](https://github.com/enoch85) @ [Tech and Me](https://www.techandme.se)
+* [Ezra Holm](https://github.com/ezraholm50) @ [Tech and Me](https://www.techandme.se)
+* [Luis Guzman](https://github.com/Ark74) @ [SwITNet](https://switnet.net)
+
+
 # Usage
 Simply change lines 16 - 28 to suit your needs:
 ```
