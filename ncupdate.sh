@@ -2,7 +2,8 @@
 #
 ## Piet's Host ## - ©2017, https://piets-host.de
 #
-# Tested on CentOS 7.3
+# Tested on CentOS 6.8 & 7.3
+# Tested on openSUSE Leap 42.1
 #
 # Most part of this script is based on the update script of the official Nextcloud VM by Tech and Me:
 # https://www.techandme.se/nextcloud-vm
@@ -46,7 +47,7 @@ NCREPO="https://download.nextcloud.com/server/releases"
 chmod +x $NCPATH/occ
 mkdir -p $HTML/backup
 mkdir -p /var/log/ncupdater
-CURRENTVERSION=$(sudo -u apache php $NCPATH/occ status | grep "versionstring" | awk '{print $3}')
+CURRENTVERSION=$(sudo -u $htuser php $NCPATH/occ status | grep "versionstring" | awk '{print $3}')
 NCVERSION=$(curl -s -m 900 $NCREPO/ | tac | grep unknown.gif | sed 's/.*"nextcloud-\([^"]*\).zip.sha512".*/\1/;q')
 
 # Must be root
@@ -219,9 +220,9 @@ if [ -d $BACKUP/themes/ ]
 then
     echo -e "$BACKUP/themes/ \e[32mexists\e[0m"
     echo 
-	chown -R apache:apache $BACKUP
+	chown -R $htuser:$htgroup $BACKUP
     echo -e "\e[32mAll files are backed up.\e[0m"
-    sudo -u apache php $NCPATH/occ maintenance:mode --on
+    sudo -u $htuser php $NCPATH/occ maintenance:mode --on
 	echo ""
     echo "Removing old Nextcloud instance in 5 seconds..."
 	
@@ -284,9 +285,9 @@ echo -ne '\n'
 	echo -e "\e[32mStarting Upgrade Process....\e[0m"
 	sleep 2
 	echo ""
-    sudo -u apache php $NCPATH/occ maintenance:mode --off
+    sudo -u $htuser php $NCPATH/occ maintenance:mode --off
 	echo ""
-    sudo -u apache php $NCPATH/occ upgrade
+    sudo -u $htuser php $NCPATH/occ upgrade
 else
     echo "Something went wrong with backing up your old nextcloud instance, please check in $BACKUP if the folders exist."
 	echo "NEXTCLOUD UPDATE FAILED - /themes couldn't be backed up - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$NAME.log
@@ -306,9 +307,9 @@ fi
 
 # Change owner of $BACKUP folder to root
 chown -R root:root $BACKUP
-chown -R apache:apache $NCPATH
+chown -R $htuser:$htgroup $NCPATH
 
-CURRENTVERSION_after=$(sudo -u apache php $NCPATH/occ status | grep "versionstring" | awk '{print $3}')
+CURRENTVERSION_after=$(sudo -u $htuser php $NCPATH/occ status | grep "versionstring" | awk '{print $3}')
 if [[ "$NCVERSION" == "$CURRENTVERSION_after" ]]
 then
     echo
@@ -330,9 +331,9 @@ directory: $NCPATH
 `date +"%d.%m.%Y-%H:%M:%S"`
 
 Thank you for using Piet's Host Nextcloud-Updater!" | mail -s "NEXTCLOUD UPDATE SUCCESS - `date +"%d.%m.%Y"`" $EMAIL
-    sudo -u apache php $NCPATH/occ status
+    sudo -u $htuser php $NCPATH/occ status
 	echo ""
-    sudo -u apache php $NCPATH/occ maintenance:mode --off
+    sudo -u $htuser php $NCPATH/occ maintenance:mode --off
     echo
     echo "Thank you for using Piet's Host Nextcloud-Updater!"
 	echo ""
@@ -342,7 +343,7 @@ Thank you for using Piet's Host Nextcloud-Updater!" | mail -s "NEXTCLOUD UPDATE 
 else
     echo
 	echo echo -e "\e[40;38;4;82mLatest: $NCVERSION \e[30;48;4;82mCurrent: $CURRENTVERSION_after \e[0m"
-    sudo -u apache php $NCPATH/occ status
+    sudo -u $htuser php $NCPATH/occ status
     echo -e "\e[31mUPGRADE FAILED!\e[0m"
     echo "Your files are still backed up at $BACKUP. No worries!"
     echo "Please report this issue to support@piets-host.de"
