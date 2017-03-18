@@ -12,7 +12,7 @@ If everything goes as expected, the script will use the occ upgrade command to u
 That's it! Visit your website and enjoy the latest version of Nextcloud!
 
 
-## original update script was found at the official Nextcloud VM by Tech and Me, maintened by:
+<b> original update script was found at the official Nextcloud VM by Tech and Me, maintened by:</b>
 * [Daniel Hanson](https://github.com/enoch85) @ [Tech and Me](https://www.techandme.se)
 * [Ezra Holm](https://github.com/ezraholm50) @ [Tech and Me](https://www.techandme.se)
 * [Luis Guzman](https://github.com/Ark74) @ [SwITNet](https://switnet.net)
