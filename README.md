@@ -1,8 +1,8 @@
 # Nextcloud Update-Script
 
-This script features an automatic Backup & Update of your Nextcloud installation, using occ.<br \>
-The script will check your installed version (e.g. 10.0.0) and the latest release-version (e.g. 10.0.2).<br \>
-If an update is available, the script will backup the following folders: /data, /config, /themes, /apps<br \>
+This script features an automatic Backup & Update of your Nextcloud installation, using occ.<br />
+The script will check your installed version (e.g. 10.0.0) and the latest release-version (e.g. 10.0.2).<br />
+If an update is available, the script will backup the following folders: /data, /config, /themes, /apps<br />
 It also backups your current database - just in case, the upgrade goes wrong!
 
 The script will check whether the backup was successful or not, and then it begins the update process by downloading the latest release.
