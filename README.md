@@ -24,7 +24,7 @@ Simply change lines 22 - 34 to suit your needs:
 # Directories - change the following lines to suit your needs
 html=/var/www/html		# root html directory
 backup=$html/backup_`date +"%Y%m%d"`		# name of the backup folder, which will be created
-ncpath=$html/nextcloud1	# name of your subfolder in root html directory, where your nextcloud installation is located
+ncpath=$html/nextcloud1	# name of subfolder in html directory, where your nextcloud installation is located
 email="example@domain.com"	# will be used for sending emails, if upgrade was successfull
 htuser='apache'  		 # Webserver-User (CentOS: apache, suseLinux: wwwrun, etc..)
 htgroup='apache' 		 # Webserver-Group (CentOS: apache, suseLinux: www, etc...)
@@ -43,7 +43,7 @@ chmod +x ./ncupdate.sh
 ./ncupdate.sh
 ```
 By default, the script will leave the folders "data", "config", "apps" and "themes" within your nextcloud path. <br />
-You can enable a file backup (copy data files to another folder) by starting the script with "-b" option:
+You can enable a file backup (copy data files to another folder) by starting the script with "-b" option:<br />
 ``./ncupdate.sh -b`` or ``./ncupdate.sh --backup`` 
 
 ## Notes
