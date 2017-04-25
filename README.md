@@ -22,19 +22,19 @@ That's it! Visit your website and enjoy the latest version of Nextcloud!
 Simply change lines 22 - 34 to suit your needs:
 ```
 # Directories - change the following lines to suit your needs
-HTML=/var/www/html		# root html directory
-BACKUP=$HTML/backup		# name of the backup folder, which will be created
-NCPATH=$HTML/nextcloud1	# name of your subfolder in html directory, where your nextcloud installation is located
-EMAIL=example@domain.com	# will be used for sending emails, if upgrade was successfull
+html=/var/www/html		# root html directory
+backup=$html/backup_`date +"%Y%m%d"`		# name of the backup folder, which will be created
+ncpath=$html/nextcloud1	# name of your subfolder in root html directory, where your nextcloud installation is located
+email="example@domain.com"	# will be used for sending emails, if upgrade was successfull
 htuser='apache'  		 # Webserver-User (CentOS: apache, suseLinux: wwwrun, etc..)
 htgroup='apache' 		 # Webserver-Group (CentOS: apache, suseLinux: www, etc...)
-NAME=nextcloud_install_1 # Define a name for your Instance, which will be upgraded
+name=nextcloud_install_1 # Define a name for your Instance, which will be upgraded
 
-# Database Variables - Look in your config.php
-DBSERVER=127.0.0.1		# Database host
-DATABASE=databasename	# Database name
-USER=databaseuser		# Database username
-PASS=S€crEtP@s$			# Database password
+# Database Variables
+dbserver=127.0.0.1		# Database host
+database="databasename"	# Database name
+user="databaseuser"		# Database username
+pass="S€crEtP@s$"			# Database password
 ```
 
 After that, set +x to the script and run it:
@@ -42,6 +42,9 @@ After that, set +x to the script and run it:
 chmod +x ./ncupdate.sh
 ./ncupdate.sh
 ```
+By default, the script will leave the folders "data", "config", "apps" and "themes" within your nextcloud path. <br />
+You can enable a file backup (copy data files to another folder) by starting the script with "-b" option:
+``./ncupdate.sh -b`` or ``./ncupdate.sh --backup`` 
 
 ## Notes
 * Tested on CentOS 6.8 & 7.3
