@@ -43,7 +43,7 @@ chmod +x ./ncupdate.sh
 ./ncupdate.sh
 ```
 By default, the script will leave the folders "data", "config", "apps" and "themes" within your nextcloud path. <br />
-That's usefull for example if you have mass data and copying data to another folder would take very much time..<br />
+That's usefull for example if you have mass data and copying data to another folder would take much time..<br />
 You can enable a file backup (copy data files to another folder) by starting the script with "-b" option:<br />
 ``./ncupdate.sh -b`` or ``./ncupdate.sh --backup`` 
 
