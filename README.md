@@ -1,6 +1,6 @@
 # Nextcloud Update-Script
 
-[![GitHub issues](https://img.shields.io/github/issues/PietsHost/nextcloud-Update-Script.svg)](https://github.com/PietsHost/nextcloud-Update-Script/issues)<br \>
+[![GitHub issues](https://img.shields.io/github/issues/PietsHost/nextcloud-Update-Script.svg)](https://github.com/PietsHost/nextcloud-Update-Script/issues)
 <a href="https://github.com/PietsHost/nextcloud-Update-Script/releases"><img src="https://img.shields.io/badge/release-v1.6-blue.svg" alt="Latest Stable Version"></a>
 
 This script features an automatic Backup & Update of your Nextcloud installation, using occ.<br /><br />
