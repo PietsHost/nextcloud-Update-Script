@@ -2,7 +2,8 @@
 
 [![GitHub issues](https://img.shields.io/github/issues/PietsHost/nextcloud-Update-Script.svg)](https://github.com/PietsHost/nextcloud-Update-Script/issues)
 
-[![GitHub releases](https://img.shields.io/github/releases/PietsHost/nextcloud-Update-Script.svg)](https://github.com/PietsHost/nextcloud-Update-Script/releases)
+[![GitHub release](https://img.shields.io/github/release/PietsHost/nextcloud-Update-Script.svg)](https://github.com/PietsHost/nextcloud-Update-Script/releases)
+
 
 This script features an automatic Backup & Update of your Nextcloud installation, using occ.<br /><br />
 The script will check your installed version (e.g. 10.0.0) and the latest release-version (e.g. 10.0.2).<br />
