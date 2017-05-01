@@ -1,7 +1,6 @@
 # Nextcloud Update-Script
 
 [![GitHub issues](https://img.shields.io/github/issues/PietsHost/nextcloud-Update-Script.svg)](https://github.com/PietsHost/nextcloud-Update-Script/issues)
-
 [![GitHub release](https://img.shields.io/github/release/PietsHost/nextcloud-Update-Script.svg)](https://github.com/PietsHost/nextcloud-Update-Script/releases)
 
 
