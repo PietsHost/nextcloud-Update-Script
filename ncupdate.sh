@@ -5,24 +5,28 @@
 # Tested on CentOS 6.8 & 7.3
 # Tested on openSUSE Leap 42.1
 #
-# Most part of this script is based on the update script of the official Nextcloud VM by Tech and Me:
+# Some parts of this script are based on the update script of the official Nextcloud VM by Tech and Me:
 # https://www.techandme.se/nextcloud-vm
-# https://github.com/nextcloud/vm/blob/master/nextcloud_update.sh
+# https://github.com/nextcloud/vm/blob/master/nextcloud_update.
 
 header=' _____ _      _         _    _           _
 |  __ (_)    | |       | |  | |         | |
 | |__) |  ___| |_ ___  | |__| | ___  ___| |_
 |  ___/ |/ _ \ __/ __| |  __  |/ _ \/ __| __|	+-+-+-+-+
-| |   | |  __/ |_\__ \ | |  | | (_) \__ \ |_ 	| v 1.2 |
+| |   | |  __/ |_\__ \ | |  | | (_) \__ \ |_ 	| v 1.3 |
 |_|   |_|\___|\__|___/ |_|  |_|\___/|___/\__|	+-+-+-+-+'
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
 
 # Directories - change the following lines to suit your needs:
 html=/var/www/html		# root html directory
-backup=$html/backup_`date +"%Y%m%d"`		# name of the backup folder, which will be created
-backupenabled="false"
 ncpath=$html/nextcloud1	# name of your subfolder in root html directory, where your nextcloud installation is located
+backup=$html/backup_`date +"%Y%m%d"`		# name of the backup folder, which will be created
+now=`date +"%Y-%m-%d"`
+date_diff="7"
+old=$(date --date="${now} -${date_diff} day" +%Y-%m-%d)
+oldbackup=/home/backup/backupsewikom_$old
+backupenabled="false"
 email="example@domain.com"	# will be used for sending emails, if upgrade was successfull
 htuser='apache'  		 # Webserver-User (CentOS: apache, suseLinux: wwwrun, etc..)
 htgroup='apache' 		 # Webserver-Group (CentOS: apache, suseLinux: www, etc...)
@@ -100,6 +104,7 @@ echo ""
 chmod +x $ncpath/occ
 rm -rf $backup
 if [[ "$backupenabled" == "true" ]]; then
+	rm -rf $oldbackup
 	mkdir -p $backup
 	echo ""
 	echo ""
@@ -123,7 +128,7 @@ wget -q -T 10 -t 2 $ncrepo/nextcloud-$ncversion.tar.bz2 > /dev/null
 if [ $? -eq 0 ]; then
 	echo ""
     printf $ugreen"SUCCESS!\n"$reset
-	rm -f $html/nextcloud-$ncversion.tar.bz2
+	rm -f nextcloud-$ncversion.tar.bz2
 else
     echo
     printf $lightred"Nextcloud $ncversion doesn't exist.\n"$reset
@@ -168,7 +173,7 @@ else
     printf "Latest version is: ${ugreen}${ncversion}${reset}. Current version is: ${ugreen}${currentversion}\n"$reset
 	echo ""
     echo "No need to upgrade, this script will exit..."
-	echo "Your Nextcloud Version $ncversion is already up to date - No upgrade needed - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+	echo "Your Nextcloud Version $ncversion is already up to date - No upgrade needed - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 	sleep 2
     exit 0
 fi
@@ -190,6 +195,8 @@ printf "  |===============>    |   (80%%)\r"
 sleep 1
 printf "  |===================>|   (100%%)\r"
 printf "\n"
+
+sudo -u $htuser php $ncpath/occ app:list > /tmp/list_before_$name
 
 if [[ "$backupenabled" == "true" ]]; then
 	# Backup data
@@ -243,7 +250,7 @@ function dbrestore {
 		echo ""
 		printf $green"Database restored successfully...\n"$reset
 		echo ""
-		echo "NEXTCLOUD UPDATE FAILED - Database restored successfully - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+		echo "NEXTCLOUD UPDATE FAILED - Database restored successfully - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 		sleep 1
 }
 	
@@ -251,11 +258,11 @@ if [[ $? > 0 ]]
 then
 	if [[ "$backupenabled" == "true" ]]; then
 		printf $red"Backup was not OK.${reset} Please check $backup and see if the folders are backed up properly"
-		echo "NEXTCLOUD UPDATE FAILED - Backup wasn't successfull - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+		echo "NEXTCLOUD UPDATE FAILED - Backup wasn't successfull - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 		exit 1
 	else
 		printf $red"Backup was not OK.${reset} Please check $ncpath and see if the folders still exist"
-		echo "NEXTCLOUD UPDATE FAILED - Backup wasn't successfull - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+		echo "NEXTCLOUD UPDATE FAILED - Backup wasn't successfull - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 		dbrestore
 		exit 1
 	fi
@@ -273,7 +280,7 @@ if [ -f $html/nextcloud-$ncversion.tar.bz2 ]; then
     printf "$html/nextcloud-$ncversion.tar.bz2 ${green}exists\n"$reset
 else
     echo "Aborting,something went wrong with the download"
-	echo "NEXTCLOUD UPDATE FAILED - Download couldn't be completed - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+	echo "NEXTCLOUD UPDATE FAILED - Download couldn't be completed - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 	dbrestore
     exit 1
 fi
@@ -283,7 +290,7 @@ if [[ "$backupenabled" == "true" ]]; then
 		printf "$backup/config/ ${green}exists\n"$reset
 	else
 		echo "Something went wrong with backing up your old nextcloud instance, please check in $backup if config/ folder exist."
-		echo "NEXTCLOUD UPDATE FAILED - /config couldn't be backed up - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+		echo "NEXTCLOUD UPDATE FAILED - /config couldn't be backed up - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 		dbrestore
 		exit 1
 	fi
@@ -292,7 +299,7 @@ else
 		printf "$ncpath/config/ ${green}exists\n"$reset
 	else
 		echo "Something went wrong with backing up your old nextcloud instance, please check in $ncpath if config/ folder exist."
-		echo "NEXTCLOUD UPDATE FAILED - /config couldn't be backed up - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+		echo "NEXTCLOUD UPDATE FAILED - /config couldn't be backed up - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 		dbrestore
 		exit 1
 	fi
@@ -303,7 +310,7 @@ if [[ "$backupenabled" == "true" ]]; then
 		printf "$backup/data/ ${green}exists\n"$reset
 	else
 		echo "Something went wrong with backing up your old nextcloud instance, please check in $backup if data/ folder exist."
-		echo "NEXTCLOUD UPDATE FAILED - /data couldn't be backed up - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+		echo "NEXTCLOUD UPDATE FAILED - /data couldn't be backed up - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 		dbrestore
 		exit 1
 	fi
@@ -312,7 +319,7 @@ else
 		printf "$ncpath/data/ ${green}exists\n"$reset
 	else
 		echo "Something went wrong with backing up your old nextcloud instance, please check in $ncpath if data/ folder exist."
-		echo "NEXTCLOUD UPDATE FAILED - /data couldn't be backed up - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+		echo "NEXTCLOUD UPDATE FAILED - /data couldn't be backed up - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 		dbrestore
 		exit 1
 	fi
@@ -323,7 +330,7 @@ if [[ "$backupenabled" == "true" ]]; then
 		printf "$backup/apps/ ${green}exists\n"$reset
 	else
 		echo "Something went wrong with backing up your old nextcloud instance, please check in $backup if apps/ folder exist."
-		echo "NEXTCLOUD UPDATE FAILED - /apps couldn't be backed up - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+		echo "NEXTCLOUD UPDATE FAILED - /apps couldn't be backed up - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 		dbrestore
 		exit 1
 	fi
@@ -332,7 +339,7 @@ else
 		printf "$ncpath/apps/ ${green}exists\n"$reset
 	else
 		echo "Something went wrong with backing up your old nextcloud instance, please check in $ncpath if apps/ folder exist."
-		echo "NEXTCLOUD UPDATE FAILED - /apps couldn't be backed up - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+		echo "NEXTCLOUD UPDATE FAILED - /apps couldn't be backed up - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 		dbrestore
 		exit 1
 	fi
@@ -343,7 +350,7 @@ if [[ "$backupenabled" == "true" ]]; then
 		printf "$backup/themes/ ${green}exists\n"$reset
     else 
 	echo "Something went wrong with backing up your old nextcloud instance, please check in $backup if apps/ folder exist."
-		echo "NEXTCLOUD UPDATE FAILED - /apps couldn't be backed up - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+		echo "NEXTCLOUD UPDATE FAILED - /apps couldn't be backed up - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 		dbrestore
 		exit 1
 	fi
@@ -352,7 +359,7 @@ else
 		printf "$ncpath/themes/ ${green}exists\n"$reset
     else 
 	echo "Something went wrong with backing up your old nextcloud instance, please check in $ncpath if apps/ folder exist."
-		echo "NEXTCLOUD UPDATE FAILED - /apps couldn't be backed up - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+		echo "NEXTCLOUD UPDATE FAILED - /apps couldn't be backed up - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 		dbrestore
 		exit 1
 	fi
@@ -433,6 +440,8 @@ if [[ "$backupenabled" == "true" ]]; then
 	sleep 2
 fi	
 
+	# remove config.sample.php
+	rm -f $ncpath/config/config.sample.php
 	printf $yellow"Setting file permissions...\n"$reset
 	echo ""
 	
@@ -453,15 +462,19 @@ fi
 	sleep 2
 	echo ""
 	chmod +x $ncpath/occ
-    #sudo -u $htuser php $ncpath/occ maintenance:mode --off
+	
 	echo ""
     sudo -u $htuser php $ncpath/occ upgrade
+	sudo -u $htuser php $ncpath/occ app:list > /tmp/list_after_$name
+
+	diff <(sed -n "/Enabled:/,/Disabled:/p" /tmp/list_before_$name) <(sed -n "/Enabled:/,/Disabled:/p" /tmp/list_after_$name) | grep '<' | cut -d- -f2 | cut -d: -f1 | xargs -L 1 sudo -u $htuser php $ncpath/occ app:enable
+	rm -f /tmp/list_after_$name
+	rm -f /tmp/list_before_$name
 	
 if [[ "$backupenabled" == "true" ]]; then
 # Change owner of $backup folder to root
 chown -R root:root $backup
 fi
-#chown -R $htuser:$htgroup $ncpath
 
 currentversion_after=$(sudo -u $htuser php $ncpath/occ status | grep "versionstring" | awk '{print $3}')
 if [[ "$ncversion" == "$currentversion_after" ]]
@@ -471,7 +484,7 @@ then
 	echo ""
 	printf $ugreen"UPGRADE SUCCESS!\n"$reset
     echo ""
-    echo "NEXTCLOUD UPDATE $CURRENTVERSION_after success - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+    echo "NEXTCLOUD UPDATE $CURRENTVERSION_after success - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 	
 	# Send E-Mail if successfully updated
 	echo "Hey there!
@@ -502,6 +515,6 @@ else
     echo "Your files are still backed up at $ncpath. No worries!"
     echo "Please report this issue to support@piets-host.de"
 	echo ""
-	echo "NEXTCLOUD UPDATE FAILED - `date +"%Y_%m_%d"`" >> /var/log/ncupdater/ncupdater_$name.log
+	echo "NEXTCLOUD UPDATE FAILED - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
     exit 1
 fi
