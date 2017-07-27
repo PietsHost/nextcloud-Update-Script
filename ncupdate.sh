@@ -96,6 +96,8 @@ while :; do
     shift
 done
 
+### For NC <12 only
+yum -y install diffutils
 
 printf $green"$header"$reset
 echo ""
@@ -196,6 +198,7 @@ sleep 1
 printf "  |===================>|   (100%%)\r"
 printf "\n"
 
+### For NC <12 only
 sudo -u $htuser php $ncpath/occ app:list > /tmp/list_before_$name
 
 if [[ "$backupenabled" == "true" ]]; then
@@ -210,20 +213,20 @@ if [[ "$backupenabled" == "true" ]]; then
 
 	rsync_param_data="-Aaxv"
 	rsync "$rsync_param_data" $ncpath/data $backup  |\
-     
+
 	pv -lep -s $(rsync "$rsync_param_data"n $ncpath/data $backup  | awk 'NF' | wc -l)
-	
+
 else
 	{
 	rm -rf `find $ncpath/. |grep -v "data"|grep -v "config"|grep -v "themes"|grep -v "apps"`
 	} &> /dev/null
 fi
-	 
+
 	unalias rm     2> /dev/null
 	rm $ncpath/${file}     2> /dev/null
 	rm $ncpath/${file}.gz  2> /dev/null
 	sleep 1
-	
+
 	# Database Backup
 	echo ""
 	printf $yellow"Starting Database Backup...\n"$reset
@@ -234,7 +237,7 @@ fi
 
 	# use this command for a database server on localhost. add other options if need be.
 	mysqldump --opt --user=${user} --password=${pass} ${database} > $ncpath/${file}
-	
+
 	gzip $file
 	printf $green"${file}.gz was created\n"$reset
 	sleep 1
@@ -253,7 +256,7 @@ function dbrestore {
 		echo "NEXTCLOUD UPDATE FAILED - Database restored successfully - `date +"%d.%m.%Y"`" >> /var/log/ncupdater/ncupdater_$name.log
 		sleep 1
 }
-	
+
 if [[ $? > 0 ]]
 then
 	if [[ "$backupenabled" == "true" ]]; then
@@ -364,7 +367,7 @@ else
 		exit 1
 	fi
 fi
-		
+
 	echo ""
 	if [[ "$backupenabled" == "true" ]]; then
 		printf $green"All files are backed up.\n"$reset
@@ -376,7 +379,7 @@ fi
 		echo ""
 		echo "Removing old Nextcloud files in 5 seconds..."
 	fi	
-	
+
 echo -ne '  |====>               |   (20%)\r'
 sleep 1
 echo -ne '  |=======>            |   (40%)\r'
@@ -387,7 +390,7 @@ echo -ne '  |===============>    |   (80%)\r'
 sleep 1
 echo -ne '  |===================>|   (100%)\r'
 echo -ne '\n'
-	
+
 if [[ "$backupenabled" == "true" ]]; then
     rm -rf $ncpath
 	echo ""
@@ -398,10 +401,9 @@ fi
 
 	printf $yellow"Files are being extracted... \n"$reset
 	echo ""
-	
+
 	pv -w 80 $html/nextcloud-$ncversion.tar.bz2 | tar xjf - -C $html
-	
-	
+
 if [[ "$backupenabled" == "true" ]]; then
 	mkdir -p $ncpath
 	mv $standardpath/* $ncpath/
@@ -422,12 +424,12 @@ else
 fi
 	rm $html/nextcloud-$ncversion.tar.bz2
 	sleep 1
-	
+
 	echo ""
 	printf $green"Extract completed.\n"$reset
 	echo ""
 	sleep 1
-	
+
 if [[ "$backupenabled" == "true" ]]; then
 	printf $yellow"Copying files back to installation.... That may take a long time - depending on your installation!\n"$reset
 	echo ""
@@ -444,7 +446,7 @@ fi
 	rm -f $ncpath/config/config.sample.php
 	printf $yellow"Setting file permissions...\n"$reset
 	echo ""
-	
+
 	# Fix permissions
 	chown -R ${rootuser}:${htgroup} ${ocpath}/
 	chown -R ${htuser}:${htgroup} ${ocpath}/apps/
@@ -456,24 +458,25 @@ fi
 	sleep 2
 	printf $green"File permissions set successfully!\n"$reset
 	echo ""
-	
+
 	# occ upgrade
 	printf $green"Starting Upgrade Process....\n"$reset
 	sleep 2
 	echo ""
 	chmod +x $ncpath/occ
-	
+
 	echo ""
     sudo -u $htuser php $ncpath/occ upgrade
-	sudo -u $htuser php $ncpath/occ app:list > /tmp/list_after_$name
 
+	### For NC <12 only
+	sudo -u $htuser php $ncpath/occ app:list > /tmp/list_after_$name
 	diff <(sed -n "/Enabled:/,/Disabled:/p" /tmp/list_before_$name) <(sed -n "/Enabled:/,/Disabled:/p" /tmp/list_after_$name) | grep '<' | cut -d- -f2 | cut -d: -f1 | xargs -L 1 sudo -u $htuser php $ncpath/occ app:enable
 	rm -f /tmp/list_after_$name
 	rm -f /tmp/list_before_$name
-	
+
 if [[ "$backupenabled" == "true" ]]; then
-# Change owner of $backup folder to root
-chown -R root:root $backup
+	# Change owner of $backup folder to root
+	chown -R root:root $backup
 fi
 
 currentversion_after=$(sudo -u $htuser php $ncpath/occ status | grep "versionstring" | awk '{print $3}')
