@@ -23,7 +23,7 @@ That's it! Visit your website and enjoy the latest version of Nextcloud!
 
 
 # Usage
-Simply change lines 22 - 34 to suit your needs:
+Simply change lines 22 - 35 to suit your needs:
 ```
 # Directories - change the following lines to suit your needs
 html=/var/www/html		# root html directory
@@ -48,8 +48,11 @@ chmod +x ./ncupdate.sh
 ```
 By default, the script will leave the folders "data", "config", "apps" and "themes" within your nextcloud path. <br />
 That's usefull for example if you have mass data and copying data to another folder would take too long..<br />
+
 You can enable a file backup (copy data files to another folder) by starting the script with "-b" option:<br />
-``./ncupdate.sh -b`` or ``./ncupdate.sh --backup`` 
+``./ncupdate.sh -b``<br />
+"-d" enables backup of external data directory, e.g. it's stored in ``/home/data``:<br />
+``./ncupdate.sh -bd /home/data``
 
 ## Notes
 * Tested on CentOS 6.8 & 7.3

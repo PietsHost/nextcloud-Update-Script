@@ -161,6 +161,7 @@ echo "make a new, fresh installation and then restore your data from backup."
 echo
 echo "Checking versions in 5 seconds.."
 
+progress_bar() {
 echo -ne '  |====>               |   (20%)\r'
 sleep 1
 echo -ne '  |=======>            |   (40%)\r'
@@ -171,6 +172,8 @@ echo -ne '  |===============>    |   (80%)\r'
 sleep 1
 echo -ne '  |===================>|   (100%)\r'
 echo -ne '\n'
+}
+progress_bar
 
 # Check if new version is larger than current version installed.
 function version_gt() { local v1 v2 IFS=.; read -ra v1 <<< "$1"; read -ra v2 <<< "$2"; printf -v v1 %03d "${v1[@]}"; printf -v v2 %03d "${v2[@]}"; [[ $v1 > $v2 ]]; }
@@ -199,16 +202,7 @@ else
 fi
 echo "Press CTRL+C to abort."
 
-printf "  |===>                |   (20%%)\r"
-sleep 1
-printf "  |=======>            |   (40%%)\r"
-sleep 1
-printf "  |===========>        |   (60%%)\r"
-sleep 1
-printf "  |===============>    |   (80%%)\r"
-sleep 1
-printf "  |===================>|   (100%%)\r"
-printf "\n"
+progress_bar
 
 if [[ "$backupenabled" == "true" ]]; then
 	# Backup data
@@ -395,16 +389,7 @@ fi
 		echo "Removing old Nextcloud files in 5 seconds..."
 	fi
 
-echo -ne '  |====>               |   (20%)\r'
-sleep 1
-echo -ne '  |=======>            |   (40%)\r'
-sleep 1
-echo -ne '  |===========>        |   (60%)\r'
-sleep 1
-echo -ne '  |===============>    |   (80%)\r'
-sleep 1
-echo -ne '  |===================>|   (100%)\r'
-echo -ne '\n'
+progress_bar
 
 if [[ "$backupenabled" == "true" ]]; then
     rm -rf $ncpath
