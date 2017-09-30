@@ -23,7 +23,7 @@ That's it! Visit your website and enjoy the latest version of Nextcloud!
 
 
 # Usage
-Simply change lines 22 - 39 to suit your needs:
+Simply change lines 22 - 35 to suit your needs:
 ```
 # Directories - change the following lines to suit your needs
 html=/var/www/html		# root html directory
