@@ -50,7 +50,7 @@ By default, the script will leave the folders "data", "config", "apps" and "them
 That's usefull for example if you have mass data and copying data to another folder would take too long..<br />
 
 You can enable a file backup (copy data files to another folder) by starting the script with "-b" option:<br />
-``./ncupdate.sh -b``
+``./ncupdate.sh -b``<br />
 "-d" enables backup of external data directory, e.g. it's stored in ``/home/data``:<br />
 ``./ncupdate.sh -bd /home/data``
 
