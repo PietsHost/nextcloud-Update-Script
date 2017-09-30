@@ -2,7 +2,7 @@
 #
 ## Piet's Host ## - ©2017, https://piets-host.de
 #
-# Tested on CentOS 6.8 & 7.3
+# Tested on CentOS 6.8 & 7.4
 # Tested on openSUSE Leap 42.1
 #
 # Some parts of this script are based on the update script of the official Nextcloud VM by Tech and Me:
@@ -13,7 +13,7 @@ header=' _____ _      _         _    _           _
 |  __ (_)    | |       | |  | |         | |
 | |__) |  ___| |_ ___  | |__| | ___  ___| |_
 |  ___/ |/ _ \ __/ __| |  __  |/ _ \/ __| __|	+-+-+-+-+
-| |   | |  __/ |_\__ \ | |  | | (_) \__ \ |_ 	| v 1.3 |
+| |   | |  __/ |_\__ \ | |  | | (_) \__ \ |_ 	| v 1.4 |
 |_|   |_|\___|\__|___/ |_|  |_|\___/|___/\__|	+-+-+-+-+'
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
@@ -21,22 +21,18 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
 # Directories - change the following lines to suit your needs:
 html=/var/www/html		# root html directory
 ncpath=$html/nextcloud1	# name of your subfolder in root html directory, where your nextcloud installation is located
-backup=$html/backup_`date +"%Y%m%d"`		# name of the backup folder, which will be created
-now=`date +"%Y-%m-%d"`
-date_diff="7"
-old=$(date --date="${now} -${date_diff} day" +%Y-%m-%d)
-oldbackup=/home/backup/backupsewikom_$old
-backupenabled="false"
+name=nextcloud_install_1 # Define a name for your Instance, which will be upgraded
+backupenabled="false"	# enable file-backup
+datadir=""				# provide external data-location, e.g. /home/data
 email="example@domain.com"	# will be used for sending emails, if upgrade was successfull
 htuser='apache'  		 # Webserver-User (CentOS: apache, suseLinux: wwwrun, etc..)
 htgroup='apache' 		 # Webserver-Group (CentOS: apache, suseLinux: www, etc...)
-name=nextcloud_install_1 # Define a name for your Instance, which will be upgraded
 
 # Database Variables
 dbserver=127.0.0.1		# Database host
 database="databasename"	# Database name
 user="databaseuser"		# Database username
-pass="S€crEtP@s$"			# Database password
+pass="S€crEtP@s$"		# Database password
 
 # Variables - Do NOT Change!
 standardpath=$html/nextcloud
@@ -45,6 +41,12 @@ restore=nextcloud.sql
 host=$hostname
 ocpath=$ncpath
 rootuser='root'
+
+backup=$html/backup_`date +"%Y%m%d"`		# name of the backup folder, which will be created
+now=`date +"%Y-%m-%d"`
+date_diff="7"
+old=$(date --date="${now} -${date_diff} day" +%Y-%m-%d)
+oldbackup=/home/backup/backupsewikom_$old
 
 ncrepo="https://download.nextcloud.com/server/releases"
 
@@ -61,46 +63,52 @@ ugreen='\e[4;32m'
 show_help() {
 cat << EOF
 
- Usage: ${0##*/} [-b BACKUP] ...
-	-h --help	display this help and exit
-	-b --backup	enable File-Backup to another folder
-	
+ Usage: ${0##*/} [-bd DATA] ...
+ e.g.: ${0##*/} -bd /home/data
+ 
+	-h display this help and exit
+	-b enable File-Backup to another folder
+	-d use external data directory
+
 EOF
 }
 
-while :; do
-    case $1 in
-        -h|-\?|--help)   # Call a "show_help" function , then exit.
-        	show_help
-			stty echo
-            exit
-            ;;
-		-b|--backup)
-				backupenabled="true"
-				shift
-            ;;
-        --)              # End of all options.
-            shift
-            break
-            ;;
-        -?*)
-            printf $redbg'Invalid option: %s' "$1" >&2
-			printf $reset"\n"
-			stty echo
-			exit 0
-            ;;
-        *)               # Default case: If no more options then break out of the loop.
-            break
+while getopts 'hbd:' opt    # -d {argument}, -b, -h
+do
+    case "$opt" in
+        d)
+		if [ -n "$2" ]; then
+				if [ -d "$2" ]; then
+					datadir="$2"
+					externaldata="true"
+            else
+                printf $redbg'ERROR: "--data" requires a non-empty option argument.' >&2
+				printf $reset"\n"
+				stty echo
+                exit 1
+            fi
+			fi
+		;;
+        h)    show_help
+		exit
+		;;
+        b)    backupenabled="true" ;;
+        *)    echo "ERROR: the options are -d {arg}, -b, -h" >&2; exit 1 ;;
     esac
-
-    shift
 done
-
-### For NC <12 only
-yum -y install diffutils
+shift $(($OPTIND - 1))
 
 printf $green"$header"$reset
 echo ""
+
+if [[ "$externaldata" == "true" && "$backupenabled" != "true" ]]; then
+	echo ""
+	echo ""
+	printf $redbg"Backup must be enabled to use external data. Type '${0##*/} -bd /location/of/data'${reset}\n"$reset
+	echo ""
+	sleep 3
+	exit 0
+fi
 
 # Versions
 chmod +x $ncpath/occ
@@ -112,6 +120,11 @@ if [[ "$backupenabled" == "true" ]]; then
 	echo ""
 	printf $green"File-Backup is enabled!\n"$reset
 	echo ""
+	if [[ "$externaldata" == "true" ]]; then
+		printf $green"External Data enabled!\n"$reset
+		echo "Location: $datadir"
+		echo ""
+	fi
 	sleep 1
 fi
 
@@ -123,7 +136,6 @@ ncversion=$(curl -s -m 900 $ncrepo/ | tac | grep unknown.gif | sed 's/.*"nextclo
 [[ `id -u` -eq 0 ]] || { echo "Must be root to run script, type: sudo -i"; exit 1; }
 
 # Upgrade Nextcloud
-echo ""
 echo ""
 echo "Checking latest released version on the Nextcloud download server and if it's possible to download..."
 wget -q -T 10 -t 2 $ncrepo/nextcloud-$ncversion.tar.bz2 > /dev/null
@@ -198,9 +210,6 @@ sleep 1
 printf "  |===================>|   (100%%)\r"
 printf "\n"
 
-### For NC <12 only
-sudo -u $htuser php $ncpath/occ app:list > /tmp/list_before_$name
-
 if [[ "$backupenabled" == "true" ]]; then
 	# Backup data
 	echo ""
@@ -211,10 +220,16 @@ if [[ "$backupenabled" == "true" ]]; then
 	rsync -Aax $ncpath/themes $backup
 	rsync -Aax $ncpath/apps $backup
 
-	rsync_param_data="-Aaxv"
-	rsync "$rsync_param_data" $ncpath/data $backup  |\
+	if [[ "$externaldata" == "true" ]]; then
+		rsync_param_data="-Aaxv"
+		rsync "$rsync_param_data" $datadir $backup  |\
+		pv -lep -s $(rsync "$rsync_param_data"n $datadir $backup  | awk 'NF' | wc -l)
+	else
+		rsync_param_data="-Aaxv"
+		rsync "$rsync_param_data" $ncpath/data $backup  |\
 
-	pv -lep -s $(rsync "$rsync_param_data"n $ncpath/data $backup  | awk 'NF' | wc -l)
+		pv -lep -s $(rsync "$rsync_param_data"n $ncpath/data $backup  | awk 'NF' | wc -l)
+	fi
 
 else
 	{
@@ -378,7 +393,7 @@ fi
 		printf $green"All files are okay.\n"$reset
 		echo ""
 		echo "Removing old Nextcloud files in 5 seconds..."
-	fi	
+	fi
 
 echo -ne '  |====>               |   (20%)\r'
 sleep 1
@@ -433,7 +448,7 @@ fi
 if [[ "$backupenabled" == "true" ]]; then
 	printf $yellow"Copying files back to installation.... That may take a long time - depending on your installation!\n"$reset
 	echo ""
-    cp -R $backup/themes $ncpath/
+	cp -R $backup/themes $ncpath/
 	cp -R $backup/config $ncpath/
 	cp -R $backup/data $ncpath/
 	
@@ -466,13 +481,7 @@ fi
 	chmod +x $ncpath/occ
 
 	echo ""
-    sudo -u $htuser php $ncpath/occ upgrade
-
-	### For NC <12 only
-	sudo -u $htuser php $ncpath/occ app:list > /tmp/list_after_$name
-	diff <(sed -n "/Enabled:/,/Disabled:/p" /tmp/list_before_$name) <(sed -n "/Enabled:/,/Disabled:/p" /tmp/list_after_$name) | grep '<' | cut -d- -f2 | cut -d: -f1 | xargs -L 1 sudo -u $htuser php $ncpath/occ app:enable
-	rm -f /tmp/list_after_$name
-	rm -f /tmp/list_before_$name
+	sudo -u $htuser php $ncpath/occ upgrade
 
 if [[ "$backupenabled" == "true" ]]; then
 	# Change owner of $backup folder to root
@@ -493,11 +502,11 @@ then
 	echo "Hey there!
 
 Your Nextcloud-Update completed successfully!
-	
-Host: $host 
+
+Host: $host
 Name: $name
 directory: $ncpath
-	
+
 `date +"%d.%m.%Y-%H:%M:%S"`
 
 Thank you for using Piet's Host Nextcloud-Updater!" | mail -s "NEXTCLOUD UPDATE SUCCESS - `date +"%d.%m.%Y"`" $email
